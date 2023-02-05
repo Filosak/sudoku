@@ -13,52 +13,67 @@ window.fill((255, 255, 255))
 
 
 # variables
-SFunctions = SudokuFunctions()
+SFunctions = SudokuFunctions(window)
 DFunctions = DrawingFunctions()
-font = pygame.font.SysFont(None, 24)
+font = pygame.font.SysFont("calibri", 72)
 run = True
 width = 1000
 height = 600
-sudoku_matrix = SFunctions.createMatrix(3)
-rectangle_pos = []
+block_size = (width-400) // 9
+chance = 5
+sudoku_matrix = SFunctions.createMatrix(chance)
 
 
 
 # draws the sudoku on screen
 pygame.draw.rect(window, (0,0,0), pygame.Rect(0, 0, 600, 600))
+DFunctions.drawMatrix(window, sudoku_matrix, block_size, font)
 
-for y in range(0, 9):
-    for x in range(0, 9):
-        rectangle_pos.append(DFunctions.drawBox(y, x, width-400, window, sudoku_matrix))
-pygame.display.update()
+# draws all buttons on screen
+reset_button = pygame.Rect(700, 100, 200, 100)
+pygame.draw.rect(window, (0,0,0), reset_button)
+window.blit(font.render("Reset", True, (255,0,0)), (720, 120))
 
-print(rectangle_pos)
+solve_button = pygame.Rect(700, 250, 200, 100)
+pygame.draw.rect(window, (0,0,0), solve_button)
+window.blit(font.render("Solve", True, (255,0,0)), (720, 270))
 
 
 
 # to do
+# focus
+# board creation change to that it creates already solved sudoku and just deltes few number
+# so theres 100% of solvable sudoku
+
 # find a way to check what square is clicked and its y and x possition in matrix so we can
 # change it after user chose what number to put in
 
-# button for resseting the suddoku board and matrix
-
 # way to visualiaze the sudoku solver algorithm
-# button for solving
 
 # way to find a difference between set numbers from the start and the numbers user put in
 
 
-
-
-
-
+pygame.display.update()
 while run:
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 run = False
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            x, y = pygame.mouse.get_pos()
+
+            if y // block_size < 9 and x // block_size < 9:
+                SFunctions.clicked_box(y // block_size, x // block_size, sudoku_matrix, block_size, font)
+                pygame.display.update()
+
+            if reset_button.collidepoint(x, y) == True:
+                sudoku_matrix = SFunctions.createMatrix(chance)
+                DFunctions.drawMatrix(window, sudoku_matrix, block_size, font)
+                pygame.display.update()
+            
+            if solve_button.collidepoint(x, y) == True:
+                SFunctions.solve_sudoku(sudoku_matrix)
+                DFunctions.drawMatrix(window, sudoku_matrix, block_size, font)
+                pygame.display.update()
 
 pygame.quit()
-
-
-# pygame.draw.rect(window, (255,255,255), pygame.Rect(30, 30, 60, 60))
