@@ -21,6 +21,7 @@ height = 600
 block_size = (width-400) // 9
 chance = 6
 sudoku_matrix = SFunctions.createMatrix(chance)
+original_matrix = [row[:] for row in sudoku_matrix]
 DFunctions = DrawingFunctions(font, block_size)
 curr_rectangles = []
 
@@ -38,14 +39,9 @@ solve_button = pygame.Rect(700, 250, 200, 100)
 pygame.draw.rect(window, (0,0,0), solve_button)
 window.blit(font.render("Solve", True, (255,0,0)), (720, 270))
 
-
-
-# to do
-# find a way to check what square is clicked and its y and x possition in matrix so we can
-# change it after user chose what number to put in
-
-
 pygame.display.update()
+
+# game
 while run:
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
@@ -55,11 +51,16 @@ while run:
             x, y = pygame.mouse.get_pos()
 
             if y // block_size < 9 and x // block_size < 9:
-                curr_rectangles = SFunctions.clicked_box(y // block_size, x // block_size, sudoku_matrix, block_size, font)
+                pls_y = y // block_size
+                pls_x = x // block_size
+                
+                if original_matrix[pls_y][pls_x] == "":
+                    curr_rectangles = SFunctions.clicked_box(pls_y, pls_x, sudoku_matrix, block_size, font)
 
 
             if reset_button.collidepoint(x, y) == True:
                 sudoku_matrix = SFunctions.createMatrix(chance)
+                original_matrix = [row[:] for row in sudoku_matrix]
                 DFunctions.drawMatrix(window, sudoku_matrix)
 
             
@@ -75,10 +76,7 @@ while run:
 
                     sudoku_matrix[curr_y][curr_x] = num
                     DFunctions.drawBox(curr_y, curr_x, window, sudoku_matrix, (255,0,0))
-
-
-
-
+                    
             pygame.display.update()
 
 pygame.quit()

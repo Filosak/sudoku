@@ -36,7 +36,6 @@ class DrawingFunctions:
 class SudokuFunctions:
     def __init__(self, screen):
         self.screen = screen
-        self.original_matrix = []
 
 
     # creates new sudoku matrix and returns it
@@ -82,7 +81,6 @@ class SudokuFunctions:
                 if random.randint(0,10) <= chance:
                     matrix[y][x] = ""
 
-        self.original_matrix = matrix[:]
         return matrix
 
 
@@ -116,9 +114,6 @@ class SudokuFunctions:
 
 
     def clicked_box(self, y, x, matrix, size, font):
-        if self.original_matrix[y][x] != "":
-            return []
-
         start_x = 700
         start_y = 400
 
