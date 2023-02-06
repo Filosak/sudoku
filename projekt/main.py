@@ -14,20 +14,21 @@ window.fill((255, 255, 255))
 
 # variables
 SFunctions = SudokuFunctions(window)
-DFunctions = DrawingFunctions()
 font = pygame.font.SysFont("calibri", 72)
+DFunctions = DrawingFunctions(font)
 run = True
 width = 1000
 height = 600
 block_size = (width-400) // 9
-chance = 5
+chance = 2
 sudoku_matrix = SFunctions.createMatrix(chance)
+
 
 
 
 # draws the sudoku on screen
 pygame.draw.rect(window, (0,0,0), pygame.Rect(0, 0, 600, 600))
-DFunctions.drawMatrix(window, sudoku_matrix, block_size, font)
+DFunctions.drawMatrix(window, sudoku_matrix, block_size)
 
 # draws all buttons on screen
 reset_button = pygame.Rect(700, 100, 200, 100)
@@ -68,12 +69,11 @@ while run:
 
             if reset_button.collidepoint(x, y) == True:
                 sudoku_matrix = SFunctions.createMatrix(chance)
-                DFunctions.drawMatrix(window, sudoku_matrix, block_size, font)
+                DFunctions.drawMatrix(window, sudoku_matrix, block_size)
                 pygame.display.update()
             
             if solve_button.collidepoint(x, y) == True:
-                SFunctions.solve_sudoku(sudoku_matrix)
-                DFunctions.drawMatrix(window, sudoku_matrix, block_size, font)
+                SFunctions.solve_sudoku(sudoku_matrix, font, block_size)
                 pygame.display.update()
 
 pygame.quit()

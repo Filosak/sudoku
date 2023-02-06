@@ -5,20 +5,31 @@ import pygame
 
 # functions for drawing on screeen
 class DrawingFunctions:
-    def drawBox(self, y, x, screen, matrix, size, font):
+    def __init__(self, font):
+        self.font = font
+
+    def drawText(self, y, x, screen, color, matrix, size):
+        box_x = size * x + 5
+        box_y = size * y + 5
+
+        text = self.font.render(matrix[y][x], True, color)
+        screen.blit(text, (box_x+10, box_y))
+
+
+    def drawBox(self, y, x, screen, matrix, size, color):
         # calculates the starting cordinates of each square and draws it
         box_x = size * x + 5
         box_y = size * y + 5
-        img2 = font.render(matrix[y][x], True, (255,0,0))
+        img2 = self.font.render(matrix[y][x], True, color)
 
         pygame.draw.rect(screen, (255,255,255), pygame.Rect(box_x, box_y, size-5, size-5))
         screen.blit(img2, (box_x+10, box_y))
 
 
-    def drawMatrix(self, screen, matrix, size, font):
+    def drawMatrix(self, screen, matrix, size, color=(0,0,0)):
         for y in range(0, 9):
             for x in range(0, 9):
-                self.drawBox(y, x, screen, matrix, size, font)
+                self.drawBox(y, x, screen, matrix, size, color)
 
 
 
@@ -98,7 +109,7 @@ class SudokuFunctions:
                 pos_y += 1
                 pos_x = 0
 
-    def solve_sudoku(self, matrix):
+    def solve_sudoku(self, matrix, font, size):
         def solve(y, x):
             if matrix[y][x] == "":
                 aviable = self.checkAviable(y, x, matrix)
@@ -117,6 +128,7 @@ class SudokuFunctions:
                         matrix[y][x] = ""
                         continue
                     else:
+                        DrawingFunctions(font).drawText(y, x, self.screen, (255,0,0), matrix, size)
                         return True
             else:
                 if x == 8 and y == 8:
