@@ -10,18 +10,18 @@ class DrawingFunctions:
         self.size = size
 
     def drawText(self, y, x, screen, color, matrix):
-        box_x = self.size * x + 5
-        box_y = self.size * y + 5
+        box_x = self.size * x + 5 + (x // 3) * 5
+        box_y = self.size * y + 5 + (y // 3) * 5
 
         text = self.font.render(matrix[y][x], True, color)
         screen.blit(text, (box_x+10, box_y))
 
 
-    def drawBox(self, y, x, screen, matrix, color):
-        box_x = self.size * x + 5
-        box_y = self.size * y + 5
+    def drawBox(self, y, x, screen, matrix, color, box_color=(255,255,255)):
+        box_x = self.size * x + 5 + (x // 3) * 5
+        box_y = self.size * y + 5 + (y // 3) * 5
 
-        pygame.draw.rect(screen, (255,255,255), pygame.Rect(box_x, box_y, self.size-5, self.size-5))
+        pygame.draw.rect(screen, box_color, pygame.Rect(box_x, box_y, self.size-5, self.size-5))
         self.drawText(y, x, screen, color ,matrix)
 
 
