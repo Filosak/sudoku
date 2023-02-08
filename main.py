@@ -19,13 +19,11 @@ run = True
 width = 1000
 height = 615
 block_size = (width-400) // 9
-chance = 6
-sudoku_matrix = SFunctions.createMatrix(chance)
+sudoku_matrix = SFunctions.createMatrix()
 original_matrix = [row[:] for row in sudoku_matrix]
 DFunctions = DrawingFunctions(font, block_size)
 curr_rectangles = []
 active = None
-# start_time = time.time()
 
 
 # draws the sudoku on screen
@@ -44,9 +42,15 @@ window.blit(font.render("Solve", True, (255,0,0)), (720, 270))
 pygame.display.update()
 
 
+# functions
+
+
+
+
+
+
 # game
 while run:
-    # pygame.display.set_caption("%s seconds" % round((time.time() - start_time), 2))
 
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
@@ -72,10 +76,11 @@ while run:
             elif reset_button.collidepoint(x, y) == True:
                 pygame.draw.rect(window, (255, 255, 255), pygame.Rect(700, 400, block_size*3+5, block_size*3))
 
-                sudoku_matrix = SFunctions.createMatrix(chance)
+                sudoku_matrix = SFunctions.createMatrix()
+                DFunctions.drawMatrix(window, sudoku_matrix)
                 original_matrix = [row[:] for row in sudoku_matrix]
                 active = None
-                DFunctions.drawMatrix(window, sudoku_matrix)
+                
             
             elif solve_button.collidepoint(x, y) == True:
                 pygame.draw.rect(window, (255, 255, 255), pygame.Rect(700, 400, block_size*3+5, block_size*3))

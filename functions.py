@@ -1,3 +1,4 @@
+# import all the libraries
 import random
 import time
 import pygame
@@ -5,26 +6,37 @@ import pygame
 
 # functions for drawing on screeen
 class DrawingFunctions:
+
+
+    # stores size of a box and the font for text
     def __init__(self, font, size):
         self.font = font
         self.size = size
 
+
+    # function for drawing text into the box we want
     def drawText(self, y, x, screen, color, matrix):
+        # calculates the starting possition (x, y) of the text we want
         box_x = self.size * x + 5 + (x // 3) * 5
         box_y = self.size * y + 5 + (y // 3) * 5
-
+        
+        # renders text into the box
         text = self.font.render(matrix[y][x], True, color)
         screen.blit(text, (box_x+10, box_y))
 
 
+    # draw the basic box for the number to go in
     def drawBox(self, y, x, screen, matrix, color, box_color=(255,255,255)):
+        # calculates the starting possition (x, y) of the box we want
         box_x = self.size * x + 5 + (x // 3) * 5
         box_y = self.size * y + 5 + (y // 3) * 5
 
+        # renders the box with the text in the box
         pygame.draw.rect(screen, box_color, pygame.Rect(box_x, box_y, self.size-5, self.size-5))
         self.drawText(y, x, screen, color ,matrix)
 
 
+    # function for drawing the whole matrix when creating a new matrix
     def drawMatrix(self, screen, matrix, color=(0,0,0)):
         for y in range(0, 9):
             for x in range(0, 9):
@@ -32,63 +44,63 @@ class DrawingFunctions:
 
 
 
-# functions for every sudoku oriented function
+
+
 class SudokuFunctions:
+
+
     def __init__(self, screen):
         self.screen = screen
 
 
-    # creates new sudoku matrix and returns it
-    def createMatrix(self, chance):
-        matrix = [[""] * 9 for _ in range(9)]
+    def deleteRandom(self, matrix):
+        tries = 3
+
+        def check(y, x):
+            if y == 8 and x == 8:
+                return 1
+            if x == 8:
+                return Solver(y+1, 0)
+            else:
+                return Solver(y, x+1)
+
+        def Solver_loop(y, x, aviable):
+            final = 0
+
+            for item in aviable:
+                matrix[y][x] = item
+                final += check(y, x)
+
+            matrix[y][x] = ""
+            return final
         
         def Solver(y, x):
             aviable = self.checkAviable(y, x, matrix)
 
             if matrix[y][x] == "":
-                for i in range(0, len(aviable)):
-                    curr = random.choice(aviable)
-
-                    matrix[y][x] = curr
-                    aviable.remove(curr)
-
-                    if y == 8 and x == 8:
-                        return True
-                    if x == 8:
-                        flag = Solver(y+1, 0)
-                    else:
-                        flag = Solver(y, x+1)
-
-                    if flag == False:
-                        continue
-                    else:
-                        return True
+                return Solver_loop(y, x, aviable)
             else:
-                if y == 8 and x == 8:
-                    return True
-                if x == 8:
-                    return Solver(y+1, 0)
-                else:
-                    return Solver(y, x+1)
+                return check(y, x)
 
+        while tries > 0:
+            y = random.randint(0, 8)
+            x = random.randint(0, 8)
+
+            placeholder = matrix[y][x]
             matrix[y][x] = ""
-            return False
 
-        Solver(0, 0)
+            flag = Solver(0, 0)
 
-        for y in range(0, 9):
-            for x in range(0, 9):
-                if random.randint(0,10) <= chance:
-                    matrix[y][x] = ""
-
+            if flag > 1:
+                matrix[y][x] = placeholder
+                tries -= 1
+        
         return matrix
 
 
-    # returns array of aviable numbers ["1", "2", "5", "8"]
     def checkAviable(self, y, x, matrix): 
         aviable = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
-        # checks in what 3x3 box were currently in # y = 5 x = 4 box_y = 3 box_x = 3
         box_y = (y // 3) * 3 
         box_x = (x // 3) * 3
 
@@ -99,11 +111,11 @@ class SudokuFunctions:
                 if curr in aviable:
                     aviable.remove(curr)
 
-        # checks verticaly and horizontaly aviable nums
         for i in range(0, 9):
             curr = matrix[i][x]
             if curr in aviable:
                 aviable.remove(curr)
+
         for i in range(0, 9):
             curr = matrix[y][i]
             if curr in aviable:
@@ -111,6 +123,41 @@ class SudokuFunctions:
 
         return aviable
 
+
+    def createMatrix(self):
+        matrix = [[""] * 9 for _ in range(9)]
+
+        def check(y, x):
+            if y == 8 and x == 8: return True
+            if x == 8: return Solver(y+1, 0)
+            else: return Solver(y, x+1)
+
+        def Solver_loop(y, x, aviable):
+            for _ in range(0, len(aviable)):
+                matrix[y][x] = random.choice(aviable)
+                aviable.remove(matrix[y][x])
+
+                if check(y, x) == False:
+                    continue
+                else:
+                    return True
+            return False
+        
+        def Solver(y, x):
+            aviable = self.checkAviable(y, x, matrix)
+
+            if matrix[y][x] == "":
+                if Solver_loop(y, x, aviable) == True:
+                    return True
+
+                matrix[y][x] = ""
+                return False
+            else:
+                return check(y, x)
+
+        Solver(0, 0)
+        self.deleteRandom(matrix)
+        return matrix
 
 
     def clicked_box(self, y, x, matrix, size, font):
