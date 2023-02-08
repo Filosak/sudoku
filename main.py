@@ -1,8 +1,13 @@
+# import of libraries
 import pygame
 import random
 import time
+
+
+# import of every needed functions from functions.py
 from functions import SudokuFunctions
 from functions import DrawingFunctions
+
 
 # setting up pygame
 pygame.init()
@@ -42,12 +47,6 @@ window.blit(font.render("Solve", True, (255,0,0)), (720, 270))
 pygame.display.update()
 
 
-# functions
-
-
-
-
-
 
 # game
 while run:
@@ -57,58 +56,67 @@ while run:
             if event.key == pygame.K_ESCAPE:
                 run = False
 
-        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+        elif event.type == pygame.MOUSEBUTTONDOWN:
             x, y = pygame.mouse.get_pos()
+            pos_y = y // block_size
+            pos_x = x // block_size
 
-            if y // block_size < 9 and x // block_size < 9:
-                pls_y = y // block_size
-                pls_x = x // block_size
+            # if user left clicks
+            if event.button == 1:
                 
-                if original_matrix[pls_y][pls_x] == "":
-                    if active:
-                        DFunctions.drawBox(active[1], active[0], window, sudoku_matrix, (255,0,0), (255,255,255))
-                    active = [pls_x, pls_y]    
-                    DFunctions.drawBox(pls_y, pls_x, window, sudoku_matrix, (255,0,0), (0,0,255))
+                # checks if the click happened inside the board
+                if pos_y < 9 and pos_x < 9:
+                    # checks if the number is from the user or it was there initialy
+                    if original_matrix[pos_y][pos_x] == "":
+                        # if any other square is selected it will be changed to white again
+                        if active:
+                            DFunctions.drawBox(active[1], active[0], window, sudoku_matrix, (255,0,0), (255,255,255))
 
-                    curr_rectangles = SFunctions.clicked_box(pls_y, pls_x, sudoku_matrix, block_size, font)
-
-
-            elif reset_button.collidepoint(x, y) == True:
-                pygame.draw.rect(window, (255, 255, 255), pygame.Rect(700, 400, block_size*3+5, block_size*3))
-
-                sudoku_matrix = SFunctions.createMatrix()
-                DFunctions.drawMatrix(window, sudoku_matrix)
-                original_matrix = [row[:] for row in sudoku_matrix]
-                active = None
-                
-            
-            elif solve_button.collidepoint(x, y) == True:
-                pygame.draw.rect(window, (255, 255, 255), pygame.Rect(700, 400, block_size*3+5, block_size*3))
-                SFunctions.solve_sudoku(sudoku_matrix, font, block_size)
+                        # active square is changed and re-colored
+                        active = [pos_x, pos_y]    
+                        DFunctions.drawBox(pos_y, pos_x, window, sudoku_matrix, (255,0,0), (0,0,255))
+                        curr_rectangles = SFunctions.clicked_box(pos_y, pos_x, sudoku_matrix, block_size, font)
 
 
-            for rect, num in curr_rectangles[1:]:
-                if rect.collidepoint(x, y) == True:
-                    curr_y = curr_rectangles[0][0]
-                    curr_x = curr_rectangles[0][1]
-
-
-                    sudoku_matrix[curr_y][curr_x] = num
-                    DFunctions.drawBox(curr_y, curr_x, window, sudoku_matrix, (255,0,0))
+                # checks if user clicked on the reset button
+                elif reset_button.collidepoint(x, y) == True:
+                    pygame.draw.rect(window, (255, 255, 255), pygame.Rect(700, 400, block_size*3+5, block_size*3))
                     
-            pygame.display.update()
-        
-        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
-            x, y = pygame.mouse.get_pos()
-
-            if y // block_size < 9 and x // block_size < 9:
-                del_y = y // block_size
-                del_x = x // block_size
+                    # changes every variable so it matches to the new matrix
+                    sudoku_matrix = SFunctions.createMatrix()
+                    DFunctions.drawMatrix(window, sudoku_matrix)
+                    original_matrix = [row[:] for row in sudoku_matrix]
+                    active = None
+                    
                 
-                if original_matrix[del_y][del_x] == "":
-                    sudoku_matrix[del_y][del_x] = ""
-                    DFunctions.drawBox(del_y, del_x, window, sudoku_matrix, (255,0,0), (255,255,255))
-                    pygame.display.update()
-            
+                # checks if the solve button is being clicked
+                elif solve_button.collidepoint(x, y) == True:
+                    pygame.draw.rect(window, (255, 255, 255), pygame.Rect(700, 400, block_size*3+5, block_size*3))
+                    SFunctions.solve_sudoku(sudoku_matrix, font, block_size)
 
+
+                # checks if user is clicking on eny of the aviable numbers 
+                for rect, num in curr_rectangles[1:]:
+                    if rect.collidepoint(x, y) == True:
+                        curr_y = curr_rectangles[0][0]
+                        curr_x = curr_rectangles[0][1]
+
+                        sudoku_matrix[curr_y][curr_x] = num
+                        DFunctions.drawBox(curr_y, curr_x, window, sudoku_matrix, (255,0,0))
+
+            # checks if user is right clicking
+            elif event.button == 3:
+                if pos_y < 9 and pos_x < 9:
+                    if original_matrix[pos_y][pos_x] == "":
+
+                        sudoku_matrix[pos_y][pos_x] = ""
+                        DFunctions.drawBox(pos_y, pos_x, window, sudoku_matrix, (255,0,0), (255,255,255))
+
+            # updates window after any change
+            pygame.display.update()
+            
+# ends the window when user clicks esc
 pygame.quit()
+
+
+
